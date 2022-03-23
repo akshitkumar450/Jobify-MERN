@@ -26,13 +26,17 @@ function Register() {
       if (!email || !password || !name) {
         toast.error("all values are required for register");
       } else {
-        toast.success("success");
+        // register
+        console.log(email, password, name);
+        toast.success("success register");
       }
     } else {
       if (!email || !password) {
         toast.error("all values are required for login ");
       } else {
-        toast.success("success");
+        // login
+        console.log(email, password);
+        toast.success("success login");
       }
     }
   };
