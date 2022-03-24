@@ -1,13 +1,13 @@
-export const loginAction = (user) => {
+export const loginAction = (user, token) => {
   return {
     type: "LOGIN",
-    payload: user,
+    payload: { user, token },
   };
 };
-export const signUpAction = (user) => {
+export const signUpAction = (user, token) => {
   return {
     type: "SIGNUP",
-    payload: user,
+    payload: { user, token },
   };
 };
 

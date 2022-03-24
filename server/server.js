@@ -11,15 +11,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// not found page
-app.use(NotFound);
-
 // connect to db
 connectDB();
 
 // api
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/job", jobsRoutes);
+
+// not found page
+app.use(NotFound);
 
 app.listen(5000, () => {
   console.log("server running");
