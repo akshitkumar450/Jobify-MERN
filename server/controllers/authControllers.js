@@ -49,7 +49,7 @@ export const login = async (req, res) => {
     const correctPassword = await bcrypt.compare(password, user.password);
     if (correctPassword) {
       const token = jwt.sign({ id: user._id }, "super-secret", {
-        expiresIn: "2d",
+        expiresIn: "1d",
       });
       res.status(201).json({
         status: "success",
@@ -73,6 +73,28 @@ export const login = async (req, res) => {
   }
 };
 
-export const updateuser = (req, res) => {
-  res.send("updateuser");
+export const updateuser = async (req, res) => {
+  // console.log(req.userId);
+  const id = req.userId;
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error("no user found");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      runValidators: true,
+      new: true,
+    });
+
+    res.status(201).json({
+      status: "success",
+      user: updatedUser,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };

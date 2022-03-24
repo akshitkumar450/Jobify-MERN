@@ -6,7 +6,10 @@ import {
   showStats,
   updateJob,
 } from "../controllers/jobsControllers.js";
+import protect from "../middlewares/authMiddleware.js";
 const router = express.Router();
+
+router.use(protect);
 
 router.route("/").post(createJob).get(getAllJobs);
 // place before :id
