@@ -10,7 +10,12 @@ export const signUpAction = (user, token) => {
     payload: { user, token },
   };
 };
-
+export const updateUser = (user) => {
+  return {
+    type: "UPDATE",
+    payload: user,
+  };
+};
 export const logoutAction = () => {
   return {
     type: "LOGOUT",

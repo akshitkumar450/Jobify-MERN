@@ -74,7 +74,7 @@ export const login = async (req, res) => {
 };
 
 export const updateuser = async (req, res) => {
-  // console.log(req.userId);
+  // console.log(req.headers);
   const id = req.userId;
   try {
     const user = await User.findById(id);

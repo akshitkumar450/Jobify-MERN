@@ -29,4 +29,16 @@ export const authService = {
       };
     }
   },
+
+  updateUser: async (data) => {
+    const config = {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    const result = await axios.patch(`${API_URL}/updateUser`, data, config);
+    return {
+      data: result.data,
+    };
+  },
 };

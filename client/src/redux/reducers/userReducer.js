@@ -21,6 +21,11 @@ export const userReducer = (state = initialState, action) => {
         user: action.payload.user,
         token: action.payload.token,
       };
+    case "UPDATE":
+      return {
+        ...state,
+        user: action.payload,
+      };
     case "LOGOUT":
       return {
         user: null,
