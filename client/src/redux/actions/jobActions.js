@@ -37,3 +37,10 @@ export const editJobAction = (id, data) => {
     payload: { id, data },
   };
 };
+
+export const deteleJobAction = (id) => {
+  return {
+    type: "DELETE_JOB",
+    payload: id,
+  };
+};

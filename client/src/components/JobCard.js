@@ -9,7 +9,9 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setJobIdAction } from "../redux/actions/jobActions";
+import { deteleJobAction, setJobIdAction } from "../redux/actions/jobActions";
+import { jobService } from "../services/jobService";
+import { toast } from "react-toastify";
 function JobCard({ job }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,8 +30,14 @@ function JobCard({ job }) {
     navigate("/add-job");
   };
 
-  const deleteJob = () => {
-    console.log(id);
+  const deleteJob = async () => {
+    try {
+      const data = await jobService.deleteJob(id);
+      // console.log(data.data.job);
+      dispatch(deteleJobAction(id));
+    } catch (err) {
+      toast.error(err.response.data.message);
+    }
   };
 
   return (

@@ -50,4 +50,16 @@ export const jobService = {
       data: result.data,
     };
   },
+
+  deleteJob: async (id) => {
+    const config = {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    const result = await axios.delete(`${API_URL}/${id}`, config);
+    return {
+      data: result.data,
+    };
+  },
 };

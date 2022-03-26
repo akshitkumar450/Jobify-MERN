@@ -62,8 +62,23 @@ export const jobById = async (req, res) => {
   }
 };
 
-export const deleteJob = (req, res) => {
-  res.send("delete job");
+export const deleteJob = async (req, res) => {
+  const jobId = req.params.id;
+  try {
+    if (!jobId) {
+      throw new Error("please give id");
+    }
+    const deletedJob = await Job.findByIdAndDelete(jobId);
+    res.status(200).json({
+      status: "success",
+      job: deletedJob,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };
 
 export const updateJob = async (req, res) => {

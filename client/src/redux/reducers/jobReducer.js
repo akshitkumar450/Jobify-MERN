@@ -43,6 +43,12 @@ const jobReducer = (state = initialState, action) => {
         ),
       };
 
+    case "DELETE_JOB":
+      return {
+        ...state,
+        jobs: state.jobs.filter((job) => job._id !== action.payload),
+      };
+
     case "CLEAR_JOBS":
       return {
         job: null,
