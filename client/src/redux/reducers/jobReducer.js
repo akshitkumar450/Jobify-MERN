@@ -19,6 +19,30 @@ const jobReducer = (state = initialState, action) => {
         jobs: action.payload,
       };
 
+    case "SET_JOB_ID":
+      return {
+        ...state,
+        jobId: action.payload,
+        editable: true,
+      };
+
+    case "CANCEL_EDIT":
+      return {
+        ...state,
+        editable: false,
+        jobId: "",
+      };
+
+    case "EDIT_JOB":
+      return {
+        ...state,
+        jobs: state.jobs.map((job) =>
+          job._id === action.payload.id
+            ? { ...job, ...action.payload.data }
+            : job
+        ),
+      };
+
     case "CLEAR_JOBS":
       return {
         job: null,

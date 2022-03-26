@@ -26,4 +26,28 @@ export const jobService = {
       data: result.data,
     };
   },
+
+  getByJobId: async (id) => {
+    const config = {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    const result = await axios.get(`${API_URL}/${id}`, config);
+    return {
+      data: result.data,
+    };
+  },
+
+  updateJob: async (id, data) => {
+    const config = {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    };
+    const result = await axios.patch(`${API_URL}/${id}`, data, config);
+    return {
+      data: result.data,
+    };
+  },
 };

@@ -3,6 +3,7 @@ import {
   createJob,
   deleteJob,
   getAllJobs,
+  jobById,
   showStats,
   updateJob,
 } from "../controllers/jobsControllers.js";
@@ -14,6 +15,6 @@ router.use(protect);
 router.route("/").post(createJob).get(getAllJobs);
 // place before :id
 router.route("/stats").get(showStats);
-router.route("/:id").delete(deleteJob).patch(updateJob);
+router.route("/:id").get(jobById).delete(deleteJob).patch(updateJob);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -7,17 +7,61 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { jobService } from "../../services/jobService";
 import { toast } from "react-toastify";
-import { addJobAction } from "../../redux/actions/jobActions";
+import {
+  addJobAction,
+  cancelEditAction,
+  editJobAction,
+} from "../../redux/actions/jobActions";
+import { useNavigate } from "react-router-dom";
 
 function AddJob() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const editable = useSelector((state) => state.jobs.editable);
+  const jobId = useSelector((state) => state.jobs.jobId);
   const job = useSelector((state) => state.jobs.job);
 
-  const [position, setPosition] = useState("");
-  const [company, setCompany] = useState("");
-  const [location, setLocation] = useState("my-city");
-  const [status, setStatus] = useState("pending");
-  const [type, setType] = useState("full-time");
+  const [position, setPosition] = useState(job?.position || "");
+  const [company, setCompany] = useState(job?.company || "");
+  const [location, setLocation] = useState(job?.jobLocation || "my-city");
+  const [status, setStatus] = useState(job?.status || "pending");
+  const [type, setType] = useState(job?.jobType || "full-time");
+
+  useEffect(() => {
+    if (editable) {
+      const getJobById = async () => {
+        try {
+          const job = await jobService.getByJobId(jobId);
+          const { company, position, jobLocation, jobType, status } =
+            job.data.job;
+          setPosition(position);
+          setCompany(company);
+          setLocation(jobLocation);
+          setStatus(status);
+          setType(jobType);
+          dispatch(addJobAction(job?.data?.job));
+        } catch (err) {
+          toast.error(err.response.data.message);
+        }
+      };
+      getJobById();
+    }
+  }, [jobId, dispatch, editable]);
+
+  const defaultStates = () => {
+    setPosition("");
+    setType("");
+    setStatus("");
+    setCompany("");
+    setLocation("");
+  };
+
+  const cancelEdit = () => {
+    dispatch(cancelEditAction());
+    defaultStates();
+    navigate("/all-jobs");
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -26,21 +70,34 @@ function AddJob() {
         toast.error("please fill postion and company");
         return;
       }
-      const job = await jobService.addJob({
-        position,
-        company,
-        status,
-        jobLocation: location,
-        type,
-      });
-      if (job?.data) {
-        toast.success("added");
-        dispatch(addJobAction(job.data.job));
-        setPosition("");
-        setType("");
-        setStatus("");
-        setCompany("");
-        setLocation("");
+      if (!editable) {
+        // for adding
+        const job = await jobService.addJob({
+          position,
+          company,
+          status,
+          jobLocation: location,
+          type,
+        });
+        if (job?.data) {
+          toast.success("added");
+          defaultStates();
+          navigate("/all-jobs");
+        }
+      } else {
+        // for editing
+        const updatedJob = await jobService.updateJob(jobId, {
+          position,
+          company,
+          status,
+          jobLocation: location,
+          jobType: type,
+        });
+        if (updatedJob?.data) {
+          toast.success("updated");
+          dispatch(editJobAction(jobId, updatedJob.data.job));
+          cancelEdit();
+        }
       }
     } catch (err) {
       toast.error(err.response.data.message);
@@ -51,9 +108,7 @@ function AddJob() {
     <section className="max-w-5xl mx-auto ">
       <div className="shadow-lg shadow-black overflow-hidden rounded-md mt-20 bg-gray-200 w-1/3 mx-auto p-5">
         <form onSubmit={onSubmit} className="space-y-5">
-          <h1 className="text-center">
-            {job?.editable ? "Edit Job" : "Add Job"}
-          </h1>
+          <h1 className="text-center">{editable ? "Edit Job" : "Add Job"}</h1>
           <div>
             <input
               type="text"
@@ -121,8 +176,13 @@ function AddJob() {
 
           <div className="w-full mx-auto">
             <Button variant="contained" className="!w-full" type="submit">
-              Add Job
+              {editable ? "Edit Job" : "Add Job"}
             </Button>
+            {editable && (
+              <Button onClick={cancelEdit} color="error" variant="contained">
+                Cancel
+              </Button>
+            )}
           </div>
         </form>
       </div>

@@ -7,8 +7,12 @@ import { Avatar } from "@mui/material";
 import WorkIcon from "@mui/icons-material/Work";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import DateRangeIcon from "@mui/icons-material/DateRange";
-
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setJobIdAction } from "../redux/actions/jobActions";
 function JobCard({ job }) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     _id: id,
     company,
@@ -20,8 +24,10 @@ function JobCard({ job }) {
   } = job;
 
   const editJob = () => {
-    console.log(id);
+    dispatch(setJobIdAction(id));
+    navigate("/add-job");
   };
+
   const deleteJob = () => {
     console.log(id);
   };

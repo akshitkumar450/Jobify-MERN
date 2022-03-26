@@ -44,12 +44,50 @@ export const createJob = async (req, res) => {
   }
 };
 
+export const jobById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const job = await Job.findById(id);
+    if (job) {
+      res.status(200).json({
+        status: "success",
+        job,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: "no data ",
+    });
+  }
+};
+
 export const deleteJob = (req, res) => {
   res.send("delete job");
 };
-export const updateJob = (req, res) => {
-  res.send("update job");
+
+export const updateJob = async (req, res) => {
+  const jobId = req.params.id;
+  try {
+    if (!jobId) {
+      throw new Error("please give id");
+    }
+    const updatedJob = await Job.findByIdAndUpdate(jobId, req.body, {
+      runValidators: true,
+      new: true,
+    });
+    res.status(200).json({
+      status: "success",
+      job: updatedJob,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };
+
 export const showStats = (req, res) => {
   res.send("stats");
 };

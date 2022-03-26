@@ -16,7 +16,7 @@ function AllJobs() {
         // console.log(jobs?.data.jobs);
         if (jobs?.data.jobs.length > 0) {
           dispatch(allJobsAction(jobs?.data.jobs));
-          toast.success("fetched");
+          // toast.success("fetched");
         }
         setLoading(false);
       } catch (err) {
