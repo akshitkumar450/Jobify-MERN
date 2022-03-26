@@ -1,7 +1,133 @@
-import React from "react";
+import { Button } from "@mui/material";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { jobService } from "../../services/jobService";
+import { toast } from "react-toastify";
+import { addJobAction } from "../../redux/actions/jobActions";
 
 function AddJob() {
-  return <div>AddJob</div>;
+  const dispatch = useDispatch();
+  const job = useSelector((state) => state.jobs.job);
+
+  const [position, setPosition] = useState("");
+  const [company, setCompany] = useState("");
+  const [location, setLocation] = useState("my-city");
+  const [status, setStatus] = useState("pending");
+  const [type, setType] = useState("full-time");
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (!position || !company) {
+        toast.error("please fill postion and company");
+        return;
+      }
+      const job = await jobService.addJob({
+        position,
+        company,
+        status,
+        jobLocation: location,
+        type,
+      });
+      if (job?.data) {
+        toast.success("added");
+        dispatch(addJobAction(job.data.job));
+        setPosition("");
+        setType("");
+        setStatus("");
+        setCompany("");
+        setLocation("");
+      }
+    } catch (err) {
+      toast.error(err.response.data.message);
+    }
+  };
+
+  return (
+    <section className="max-w-5xl mx-auto ">
+      <div className="shadow-lg shadow-black overflow-hidden rounded-md mt-20 bg-gray-200 w-1/3 mx-auto p-5">
+        <form onSubmit={onSubmit} className="space-y-5">
+          <h1 className="text-center">
+            {job?.editable ? "Edit Job" : "Add Job"}
+          </h1>
+          <div>
+            <input
+              type="text"
+              className="w-full h-10 rounded-md p-2"
+              value={company}
+              placeholder="company"
+              onChange={(e) => setCompany(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              className="w-full h-10 rounded-md p-2"
+              value={position}
+              placeholder="postion"
+              onChange={(e) => setPosition(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <input
+              type="text"
+              className="w-full h-10 rounded-md p-2"
+              value={location}
+              placeholder="location"
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </div>
+          <div>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label1">status</InputLabel>
+              <Select
+                labelId="demo-simple-select-label1"
+                id="demo-simple-select1"
+                value={status}
+                label="status"
+                className="w-full bg-white"
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                <MenuItem value="interview">interview</MenuItem>
+                <MenuItem value="declined">declined</MenuItem>
+                <MenuItem value="pending">pending</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+
+          <div>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label2">type</InputLabel>
+              <Select
+                labelId="demo-simple-select-label2"
+                id="demo-simple-select2"
+                value={type}
+                label="type"
+                className="w-full bg-white"
+                onChange={(e) => setType(e.target.value)}
+              >
+                <MenuItem value="full-time">full-time</MenuItem>
+                <MenuItem value="part-time">part-time</MenuItem>
+                <MenuItem value="remote">remote</MenuItem>
+                <MenuItem value="internship">internship</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+
+          <div className="w-full mx-auto">
+            <Button variant="contained" className="!w-full" type="submit">
+              Add Job
+            </Button>
+          </div>
+        </form>
+      </div>
+    </section>
+  );
 }
 
 export default AddJob;

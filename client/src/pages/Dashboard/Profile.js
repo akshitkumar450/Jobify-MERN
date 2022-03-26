@@ -14,7 +14,7 @@ function Profile() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(name, email, lastName, location);
+    // console.log(name, email, lastName, location);
     try {
       const updatedUser = await authService.updateUser({
         name,

@@ -14,6 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../redux/actions/userActions";
+import { clearJobsAction } from "../redux/actions/jobActions";
 
 const pages = [
   {
@@ -119,13 +120,14 @@ const Navbar = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
-              <Button
-                key={page.name}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                <Link to={`${page.link}`}>{page.name}</Link>
-              </Button>
+              <Link to={`${page.link}`} key={page.name}>
+                <Button
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: "white", display: "block" }}
+                >
+                  {page.name}
+                </Button>
+              </Link>
             ))}
           </Box>
 
@@ -156,7 +158,8 @@ const Navbar = () => {
                   <Typography
                     textAlign="center"
                     onClick={() => {
-                      dispatch(setting.function());
+                      dispatch(logoutAction());
+                      dispatch(clearJobsAction());
                       localStorage.clear();
                       navigate("/landing");
                     }}
