@@ -2,15 +2,18 @@ import Job from "../models/jobModel.js";
 
 export const getAllJobs = async (req, res) => {
   const id = req.userId;
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 2;
+  const skipVal = (page - 1) * limit;
   try {
     // to get the jobs for the logged in user only
-    const jobs = await Job.find({ createdBy: id });
-    if (jobs.length > 0) {
-      res.status(200).json({
-        status: "success",
-        jobs,
-      });
-    }
+    const totalJobs = await Job.find({ createdBy: id });
+    const jobs = await Job.find({ createdBy: id }).skip(skipVal).limit(limit);
+    res.status(200).json({
+      status: "success",
+      jobs,
+      totalJobs,
+    });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -68,6 +71,10 @@ export const deleteJob = async (req, res) => {
     if (!jobId) {
       throw new Error("please give id");
     }
+    const jobToBeDelete = await Job.findById(jobId);
+    if (!jobToBeDelete) {
+      throw new Error("No job found");
+    }
     const deletedJob = await Job.findByIdAndDelete(jobId);
     res.status(200).json({
       status: "success",
@@ -86,6 +93,10 @@ export const updateJob = async (req, res) => {
   try {
     if (!jobId) {
       throw new Error("please give id");
+    }
+    const jobToBeUpdate = await Job.findById(jobId);
+    if (!jobToBeUpdate) {
+      throw new Error("No job found");
     }
     const updatedJob = await Job.findByIdAndUpdate(jobId, req.body, {
       runValidators: true,

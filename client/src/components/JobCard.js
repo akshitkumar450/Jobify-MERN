@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { deteleJobAction, setJobIdAction } from "../redux/actions/jobActions";
 import { jobService } from "../services/jobService";
 import { toast } from "react-toastify";
-function JobCard({ job }) {
+function JobCard({ job, handleToggle }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -35,6 +35,7 @@ function JobCard({ job }) {
       const data = await jobService.deleteJob(id);
       // console.log(data.data.job);
       dispatch(deteleJobAction(id));
+      handleToggle();
     } catch (err) {
       toast.error(err.response.data.message);
     }

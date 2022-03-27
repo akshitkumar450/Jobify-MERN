@@ -15,13 +15,13 @@ export const jobService = {
     };
   },
 
-  getJobs: async () => {
+  getJobs: async (page) => {
     const config = {
       headers: {
         authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     };
-    const result = await axios.get(API_URL, config);
+    const result = await axios.get(`${API_URL}?page=${page}&limit=2`, config);
     return {
       data: result.data,
     };
