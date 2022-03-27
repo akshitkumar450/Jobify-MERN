@@ -75,6 +75,10 @@ export const deleteJob = async (req, res) => {
     if (!jobToBeDelete) {
       throw new Error("No job found");
     }
+    // make sure only logged in user matches the goal user
+    if (jobToBeDelete.createdBy.toString() !== req.userId.toString()) {
+      throw new Error("you can not delete this job");
+    }
     const deletedJob = await Job.findByIdAndDelete(jobId);
     res.status(200).json({
       status: "success",
@@ -95,8 +99,13 @@ export const updateJob = async (req, res) => {
       throw new Error("please give id");
     }
     const jobToBeUpdate = await Job.findById(jobId);
+    // console.log(req.userId, jobToBeUpdate.createdBy);
     if (!jobToBeUpdate) {
       throw new Error("No job found");
+    }
+    // make sure only logged in user matches the goal user
+    if (jobToBeUpdate.createdBy.toString() !== req.userId.toString()) {
+      throw new Error("you can not update this job");
     }
     const updatedJob = await Job.findByIdAndUpdate(jobId, req.body, {
       runValidators: true,
@@ -104,7 +113,7 @@ export const updateJob = async (req, res) => {
     });
     res.status(200).json({
       status: "success",
-      job: updatedJob,
+      // job: updatedJob,
     });
   } catch (err) {
     res.status(400).json({
