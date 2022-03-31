@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { statsService } from "../../services/statsServices";
 import { toast } from "react-toastify";
 import StatCard from "../../components/StatCard";
+import ChartsContainer from "../../components/ChartsContainer";
+
 function Stats() {
   const [stats, setStats] = useState({});
   const [monthly, setMonthly] = useState([]);
@@ -41,11 +43,14 @@ function Stats() {
     },
   ];
   return (
-    <div className="grid grid-cols-3 gap-5 mt-20 px-5">
-      {defaultStats.map((stat, idx) => (
-        <StatCard key={idx} stat={stat} />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-3 gap-5 mt-20 px-5">
+        {defaultStats.map((stat, idx) => (
+          <StatCard key={idx} stat={stat} />
+        ))}
+      </div>
+      {monthly.length > 0 && <ChartsContainer monthly={monthly} />}
+    </>
   );
 }
 
