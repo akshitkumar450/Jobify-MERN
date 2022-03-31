@@ -7,10 +7,49 @@ export const getAllJobs = async (req, res) => {
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 2;
   const skipVal = (page - 1) * limit;
+  const { status, jobType, sort, search } = req.query;
   try {
     // to get the jobs for the logged in user only
     const totalJobs = await Job.find({ createdBy: id });
-    const jobs = await Job.find({ createdBy: id }).skip(skipVal).limit(limit);
+    const queryObj = { createdBy: id };
+
+    if (status && status !== "all") {
+      queryObj.status = status;
+    }
+
+    if (jobType && jobType !== "all") {
+      queryObj.jobType = jobType;
+    }
+
+    // search
+    if (search && search !== "") {
+      // i -> case insensitive
+      // text exist in general (not exact match)
+      queryObj.position = { $regex: search, $options: "i" };
+    }
+
+    let result = Job.find(queryObj);
+    // sorting
+    if (sort === "latest") {
+      result = result.sort("-createdAt");
+    }
+    if (sort === "oldest") {
+      result = result.sort("createdAt");
+    }
+    if (sort === "a-z") {
+      result = result.sort("position");
+    }
+    if (sort === "z-a") {
+      result = result.sort("-position");
+    }
+
+    console.log(queryObj);
+
+    result = Job.find(queryObj).skip(skipVal).limit(limit);
+
+    const jobs = await result;
+    console.log(jobs.length);
+
     res.status(200).json({
       status: "success",
       jobs,

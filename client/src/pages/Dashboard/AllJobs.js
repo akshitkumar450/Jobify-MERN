@@ -5,6 +5,7 @@ import { allJobsAction } from "../../redux/actions/jobActions";
 import { jobService } from "../../services/jobService";
 import { toast } from "react-toastify";
 import Pagination from "@mui/material/Pagination";
+import SearchJob from "../../components/SearchJob";
 
 function AllJobs() {
   const dispatch = useDispatch();
@@ -39,6 +40,8 @@ function AllJobs() {
 
   return (
     <div className="max-w-5xl mx-auto p-20">
+      <SearchJob />
+
       <h3>{totalJobs} Jobs Found</h3>
       <div className="grid grid-cols-2 gap-10">
         {jobs?.map((job) => (
