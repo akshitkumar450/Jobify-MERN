@@ -1,5 +1,7 @@
 import Job from "../models/jobModel.js";
 import mongoose from "mongoose";
+import moment from "moment";
+
 export const getAllJobs = async (req, res) => {
   const id = req.userId;
   const page = req.query.page * 1 || 1;
@@ -131,12 +133,48 @@ export const showStats = async (req, res) => {
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ]);
 
+    let monthlyApplications = await Job.aggregate([
+      { $match: { createdBy: mongoose.Types.ObjectId(req.userId) } },
+      {
+        $group: {
+          _id: {
+            year: {
+              $year: "$createdAt",
+            },
+            month: {
+              $month: "$createdAt",
+            },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1 } },
+      { $limit: 6 },
+    ]);
+
     // tranforming data as a object instead of an array
     stats = stats.reduce((acc, curr) => {
       const { _id: title, count } = curr;
       acc[title] = count;
       return acc;
     }, {});
+
+    // refactor our data to be used effectively in frontend
+    monthlyApplications = monthlyApplications
+      .map((item) => {
+        const {
+          _id: { year, month },
+          count,
+        } = item;
+
+        // accepts 0-11
+        const date = moment()
+          .month(month - 1)
+          .year(year)
+          .format("MMM Y");
+        return { date, count };
+      })
+      .reverse();
 
     // if user has no jobs (default stats)
     const finalStats = {
@@ -148,6 +186,7 @@ export const showStats = async (req, res) => {
     res.status(200).json({
       status: "success",
       stats: finalStats,
+      monthly: monthlyApplications,
     });
   } catch (err) {
     res.status(400).json({

@@ -4,12 +4,14 @@ import { toast } from "react-toastify";
 import StatCard from "../../components/StatCard";
 function Stats() {
   const [stats, setStats] = useState({});
+  const [monthly, setMonthly] = useState([]);
 
   useEffect(() => {
     const getStats = async () => {
       try {
         const data = await statsService.getStats();
-        console.log(data.data.stats);
+        console.log(data.data);
+        setMonthly(data.data.monthly);
         setStats(data.data.stats);
       } catch (err) {
         toast.error(err.response.data.message);
@@ -40,8 +42,8 @@ function Stats() {
   ];
   return (
     <div className="grid grid-cols-3 gap-5 mt-20 px-5">
-      {defaultStats.map((stat) => (
-        <StatCard stat={stat} />
+      {defaultStats.map((stat, idx) => (
+        <StatCard key={idx} stat={stat} />
       ))}
     </div>
   );
