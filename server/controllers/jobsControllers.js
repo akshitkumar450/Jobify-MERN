@@ -1,5 +1,5 @@
 import Job from "../models/jobModel.js";
-
+import mongoose from "mongoose";
 export const getAllJobs = async (req, res) => {
   const id = req.userId;
   const page = req.query.page * 1 || 1;
@@ -17,7 +17,7 @@ export const getAllJobs = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: "fail",
-      message: "no Data found",
+      message: "no Jobs found",
     });
   }
 };
@@ -123,6 +123,36 @@ export const updateJob = async (req, res) => {
   }
 };
 
-export const showStats = (req, res) => {
-  res.send("stats");
+export const showStats = async (req, res) => {
+  try {
+    let stats = await Job.aggregate([
+      // to filter out the jobs for a logged in user
+      { $match: { createdBy: mongoose.Types.ObjectId(req.userId) } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+
+    // tranforming data as a object instead of an array
+    stats = stats.reduce((acc, curr) => {
+      const { _id: title, count } = curr;
+      acc[title] = count;
+      return acc;
+    }, {});
+
+    // if user has no jobs (default stats)
+    const finalStats = {
+      pending: stats.pending || 0,
+      interview: stats.interview || 0,
+      declined: stats.declined || 0,
+    };
+
+    res.status(200).json({
+      status: "success",
+      data: finalStats,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };

@@ -41,20 +41,22 @@ function AllJobs() {
     <div className="max-w-5xl mx-auto p-20">
       <h3>{totalJobs} Jobs Found</h3>
       <div className="grid grid-cols-2 gap-10">
-        {jobs.map((job) => (
+        {jobs?.map((job) => (
           <JobCard key={job._id} job={job} handleToggle={handleToggle} />
         ))}
       </div>
 
-      <div className="flex justify-center mt-5">
-        <Pagination
-          count={Math.ceil(totalJobs / 2)}
-          page={page}
-          onChange={(event, value) => {
-            setPage(value);
-          }}
-        />
-      </div>
+      {jobs.length !== 0 && (
+        <div className="flex justify-center mt-5">
+          <Pagination
+            count={Math.ceil(totalJobs / 2)}
+            page={page}
+            onChange={(event, value) => {
+              setPage(value);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
