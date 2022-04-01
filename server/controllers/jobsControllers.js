@@ -3,15 +3,11 @@ import mongoose from "mongoose";
 import moment from "moment";
 
 export const getAllJobs = async (req, res) => {
-  const id = req.userId;
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 2;
-  const skipVal = (page - 1) * limit;
   const { status, jobType, sort, search } = req.query;
+  console.log(req.query);
   try {
     // to get the jobs for the logged in user only
-    const totalJobs = await Job.find({ createdBy: id });
-    const queryObj = { createdBy: id };
+    const queryObj = { createdBy: req.userId };
 
     if (status && status !== "all") {
       queryObj.status = status;
@@ -29,6 +25,7 @@ export const getAllJobs = async (req, res) => {
     }
 
     let result = Job.find(queryObj);
+
     // sorting
     if (sort === "latest") {
       result = result.sort("-createdAt");
@@ -43,19 +40,28 @@ export const getAllJobs = async (req, res) => {
       result = result.sort("-position");
     }
 
-    console.log(queryObj);
+    // pagination
+    let page, limit, skipVal;
+    // if (req.query.page >= 0) {
+    page = req.query.page * 1 || 1;
+    limit = req.query.limit * 1 || 2;
+    skipVal = (page - 1) * limit;
+    // }
 
-    result = Job.find(queryObj).skip(skipVal).limit(limit);
+    const jobs = await result.skip(skipVal).limit(limit);
 
-    const jobs = await result;
-    console.log(jobs.length);
+    const totalJobs = await Job.countDocuments(queryObj);
+
+    const numOfPages = Math.ceil(totalJobs / limit);
 
     res.status(200).json({
       status: "success",
       jobs,
       totalJobs,
+      numOfPages,
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({
       status: "fail",
       message: "no Jobs found",

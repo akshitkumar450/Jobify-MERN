@@ -15,13 +15,17 @@ export const jobService = {
     };
   },
 
-  getJobs: async (page) => {
+  getJobs: async (page, sort, search, status, type) => {
     const config = {
       headers: {
         authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     };
-    const result = await axios.get(`${API_URL}?page=${page}&limit=2`, config);
+    let url = `${API_URL}?status=${status}&jobType=${type}&sort=${sort}&page=${page}&limit=2`;
+    if (search) {
+      url = url + `&search=${search}`;
+    }
+    const result = await axios.get(url, config);
     return {
       data: result.data,
     };
