@@ -25,12 +25,14 @@ function AllJobs() {
 
   useEffect(() => {
     const getAllJobs = async () => {
+      console.log("ru");
       try {
         const jobs = await jobService.getJobs(page, sort, search, status, type);
         console.log("Jobs", jobs?.data);
-        // if (jobs.data.jobs.length === 0 && search === "") {
-        //   setPage(page - 1);
-        // }
+        // to avoid negative page while searching
+        if (jobs.data.jobs.length === 0) {
+          setPage(Math.max(1, page - 1));
+        }
         setTotalPages(jobs?.data.numOfPages);
         setTotalJobs(jobs?.data.totalJobs);
         // if (jobs?.data.jobs.length > 0) {
